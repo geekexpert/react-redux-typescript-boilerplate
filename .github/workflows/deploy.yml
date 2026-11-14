@@ -1,0 +1,79 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build for Test (Develop Branch)
+        if: github.ref == 'refs/heads/develop'
+        run: npm run build:test
+
+      - name: Build for Production (Main Branch)
+        if: github.ref == 'refs/heads/main'
+        run: npm run build:prod
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-dist
+          path: dist/
+
+  deploy-test:
+    name: Deploy to Test
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: Test
+
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: react-dist
+          path: dist/
+
+      - name: Run Test Deployment
+        run: |
+          echo "Deploying test build to server / S3 bucket..."
+          # Example: aws s3 sync dist/ s3://your-test-bucket --delete
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: 
+      name: Production
+      url: https://yourdomain.com
+
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: react-dist
+          path: dist/
+
+      - name: Run Production Deployment
+        run: |
+          echo "Deploying production build to server / S3 bucket..."
+          # Example: aws s3 sync dist/ s3://your-prod-bucket --delete
