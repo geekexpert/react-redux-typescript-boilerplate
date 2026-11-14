@@ -4,6 +4,7 @@ import { add, hasChecked, type SampleItem } from './sampleSlicer';
 import styles from './SampleComponent.module.css';
 import { useTranslation } from 'react-i18next';
 
+import { config } from '../../app/config';
 
 // Use export here, do not export as default, to allow for better tree shaking and easier testing
 export const SampleComponent: React.FC = () => {
@@ -32,6 +33,11 @@ export const SampleComponent: React.FC = () => {
 
         }
         return;
+    }
+
+    // Only log in development mode
+    if(config.isDev) {
+        console.log('SampleComponent rendered in development mode');
     }
 
     return (
