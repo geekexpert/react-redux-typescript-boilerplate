@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { add, hasChecked, type SampleItem } from './sampleSlicer';
 import styles from './SampleComponent.module.css';
+import { useTranslation } from 'react-i18next';
 
 
 // Use export here, do not export as default, to allow for better tree shaking and easier testing
@@ -13,6 +14,9 @@ export const SampleComponent: React.FC = () => {
     
     // using HTMLInputElement in a Component with TypeScript
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // localization hook from react-i18next
+    const { t } = useTranslation();
 
     // private component Function to add an item to the list
     const addItem = () => {
@@ -32,6 +36,7 @@ export const SampleComponent: React.FC = () => {
 
     return (
         <div className={styles.mainDiv}>
+            <h1>{t('welcome_message')}</h1>
             <h3>Add an item:</h3>
             <div style={{ margin: '20px' }}>
                 <input
